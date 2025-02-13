@@ -4,8 +4,8 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Services {
-  final String baseUrl = "http://localhost:20399/";
-  // final String baseUrl = "https://zaad-pos-backend.onrender.com/";
+  // final String baseUrl = "http://localhost:20399/";
+  final String baseUrl = "https://zaad-pos-backend.onrender.com/";
 
   // URLs
   String get loginUrl => "${baseUrl}user/login";
