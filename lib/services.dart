@@ -11,13 +11,15 @@ class Services {
   String get loginUrl => "${baseUrl}user/login";
   String get addUserUrl => "${baseUrl}user/add_user";
   String get getAllUsersUrl => "${baseUrl}user/get_all_users";
+  String get getAllCustomersUrl => "${baseUrl}customer/get_all_customers";
   String get addCategoryUrl => "${baseUrl}product/add_category";
   String get getAllCategoriesUrl => "${baseUrl}product/get_all_categories";
   String get deleteCategoryUrl => "${baseUrl}product/delete_category";
   String get saveProductUrl => "${baseUrl}product/save_product";
-  String get deleteProductUrl => "${baseUrl}product/delete_product";
+  String get deleteProductUrl => "${baseUrl}produc  t/delete_product";
   String get getAllProductsUrl => "${baseUrl}product/get_all_products";
   String get getProductDetailUrl => "${baseUrl}product/get_product_detail";
+  String get saveCustomerUrl => "${baseUrl}customer/save_customer";
 
   // Functions
 
@@ -42,6 +44,21 @@ class Services {
         "Content-Type": "application/json",
       },
       body: jsonEncode(userData),
+    );
+    return response;
+  }
+
+  Future<http.Response> saveCustomer(Map<String, dynamic> customerData) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String? token = pref.getString('token');
+
+    final response = await http.post(
+      Uri.parse(saveCustomerUrl),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode(customerData),
     );
     return response;
   }
@@ -74,33 +91,33 @@ class Services {
     }
   }
 
-  // Future<http.Response> getllCustomers() async {
-  //   try {
-  //     SharedPreferences pref = await SharedPreferences.getInstance();
-  //     String? token = pref.getString('token');
+  Future<http.Response> getAllCustomers() async {
+    try {
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      String? token = pref.getString('token');
 
-  //     if (token == null || token.isEmpty) {
-  //       throw Exception("Token is missing or empty.");
-  //     }
+      if (token == null || token.isEmpty) {
+        throw Exception("Token is missing or empty.");
+      }
 
-  //     final response = await http.get(
-  //       Uri.parse(getAllUsersUrl),
-  //       headers: {
-  //         "Authorization": "Bearer $token",
-  //         "Content-Type": "application/json",
-  //       },
-  //     );
+      final response = await http.get(
+        Uri.parse(getAllCustomersUrl),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+      );
 
-  //     if (response.statusCode == 200) {
-  //       return response;
-  //     } else {
-  //       throw Exception("Failed to fetch users. Status code: ${response.statusCode}");
-  //     }
-  //   } catch (e) {
-  //     print("Error in getAllUsers: $e");
-  //     rethrow;
-  //   }
-  // }
+      if (response.statusCode == 200) {
+        return response;
+      } else {
+        throw Exception("Failed to fetch users. Status code: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error in getAllUsers: $e");
+      rethrow;
+    }
+  }
 
   Future<http.Response> addCategory(Map<String, dynamic> categoryData) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
