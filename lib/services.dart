@@ -138,7 +138,7 @@ class Services {
   Future<http.Response> getAllCategories() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     String? token = pref.getString('token');
-
+    print('object');
     final response = await http.get(
       Uri.parse(getAllCategoriesUrl),
       headers: {

@@ -13,20 +13,19 @@ class CategoryScreen extends StatefulWidget {
 
 class _CategoryScreenState extends State<CategoryScreen> {
   List categoriesList = [];
-
   Future<void> fetchCategories() async {
     try {
       Response response = await Services().getAllCategories();
       var result = jsonDecode(response.body);
       if (result['status']) {
         setState(() {
-          categoriesList = result['data'];
+          categoriesList = List.from(result['data'] ?? []);
         });
       } else {
-        throw Exception('Failed to fetch categories.');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to fetch categories')));
       }
     } catch (e) {
-      print("Error fetching categories: $e");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error fetching categories: $e')));
     }
   }
 
@@ -57,57 +56,46 @@ class _CategoryScreenState extends State<CategoryScreen> {
               ),
               SizedBox(height: 16),
               Expanded(
-                child: FutureBuilder(
-                  future: fetchCategories(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator.adaptive());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Failed to load categories: ${snapshot.error}'));
-                    } else {
-                      return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal, // Enables horizontal scrolling for smaller screens
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(minWidth: constraints.maxWidth), // Prevents overflow
-                          child: DataTable(
-                            columnSpacing: 20,
-                            columns: const [
-                              DataColumn(label: Text('SL No.')),
-                              DataColumn(label: Text('Category (ENG)')),
-                              DataColumn(label: Text('Category (Arabic)')),
-                              DataColumn(label: Text('Actions')),
-                            ],
-                            rows: List.generate(
-                              categoriesList.length,
-                              (index) => DataRow(
-                                color: WidgetStatePropertyAll(index.isOdd ? Colors.grey.shade200 : Colors.white),
-                                cells: [
-                                  DataCell(Text('${index + 1}')),
-                                  DataCell(Text(categoriesList[index]['category_name_eng'] ?? 'N/A')),
-                                  DataCell(Text(categoriesList[index]['category_name_arabic'] ?? 'N/A')),
-                                  DataCell(
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min, // Prevents overflow in small screens
-                                      children: [
-                                        IconButton(
-                                          icon: Icon(Icons.edit, color: AppColors.stextColor),
-                                          onPressed: () => _showAddEditStaffDialog(index: index),
-                                        ),
-                                        IconButton(
-                                          icon: Icon(Icons.delete, color: Colors.red),
-                                          onPressed: () => _confirmDeleteStaff(index),
-                                        ),
-                                      ],
-                                    ),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal, // Enables horizontal scrolling for smaller screens
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minWidth: constraints.maxWidth), // Prevents overflow
+                    child: DataTable(
+                      columnSpacing: 20,
+                      columns: const [
+                        DataColumn(label: Text('SL No.')),
+                        DataColumn(label: Text('Category (ENG)')),
+                        DataColumn(label: Text('Category (Arabic)')),
+                        DataColumn(label: Text('Actions')),
+                      ],
+                      rows: List.generate(
+                        categoriesList.length,
+                        (index) => DataRow(
+                          color: WidgetStatePropertyAll(index.isOdd ? Colors.grey.shade200 : Colors.white),
+                          cells: [
+                            DataCell(Text('${index + 1}')),
+                            DataCell(Text(categoriesList[index]['category_name_eng'] ?? 'N/A')),
+                            DataCell(Text(categoriesList[index]['category_name_arabic'] ?? 'N/A')),
+                            DataCell(
+                              Row(
+                                mainAxisSize: MainAxisSize.min, // Prevents overflow in small screens
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.edit, color: AppColors.stextColor),
+                                    onPressed: () => _showAddEditStaffDialog(index: index),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () => _confirmDeleteStaff(index),
                                   ),
                                 ],
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      );
-                    }
-                  },
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],

@@ -14,18 +14,19 @@ class ProductsScreen extends StatefulWidget {
 class _ProductsScreenState extends State<ProductsScreen> {
   List productsList = [];
   List categoriesList = [];
-
   Future<void> fetchCategories() async {
     try {
       Response response = await Services().getAllCategories();
       var result = jsonDecode(response.body);
       if (result['status']) {
         setState(() {
-          categoriesList = result['data'];
+          categoriesList = List.from(result['data'] ?? []);
         });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to fetch categories')));
       }
     } catch (e) {
-      print("Error fetching categories: $e");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error fetching categories: $e')));
     }
   }
 
@@ -35,11 +36,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
       var result = jsonDecode(response.body);
       if (result['status']) {
         setState(() {
-          productsList = result['data'];
+          productsList = List.from(result['data'] ?? []);
         });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to fetch products')));
       }
     } catch (e) {
-      print("Error fetching products: $e");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error fetching products: $e')));
     }
   }
 
@@ -220,7 +223,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       child: Text(category['category_name_eng'] ?? ''),
                     );
                   }).toList(),
-                  onChanged: (value) => catId = value,
+                  onChanged: (value) {
+                    setState(() {
+                      catId = value;
+                    });
+                  },
                 ),
                 SizedBox(height: 16),
                 TextField(controller: unitPriceController, decoration: InputDecoration(labelText: 'Unit Price'), keyboardType: TextInputType.number),
